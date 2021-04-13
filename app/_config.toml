@@ -9,5 +9,5 @@ name = "your.database.name"
 
 [app]
 version = "2021.xxxx.xxxx"      # should be rewritten by 'main.py' with the modify time of itself.
-SAMPLE_POINTS = 200     # how many describe point should openCV.orb find.
-MATCH_POINT = 0.2       # how much is the capture similar to the original maker picture.
+DEFAULT_TEAMS_STRING = '勇士,北京,北控,掘金,热刺,埃弗顿,F1,皇家马德里'
+GRAB_INTERVAL = 1800    # how many second the grabbed page expires, for a sports game, half an hour should be OK.

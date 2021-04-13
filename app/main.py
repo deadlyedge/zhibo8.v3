@@ -7,7 +7,6 @@ from static import xlogger, getLists
 config = toml.load('config.toml')
 logger = xlogger.get_my_logger(__name__)
 
-DEFAULT_TEAMS = config['app']['DEFAULT_TEAMS']
 DEFAULT_TEAMS_STRING = config['app']['DEFAULT_TEAMS_STRING']
 
 # logger.debug(gameList)
