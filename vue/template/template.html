@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>直播吧定制过滤 V2</title>
+
+    <script type="text/javascript" src="/eel.js"></script>
+    <link rel="stylesheet" href="../css/style.css">
+
+
+</head>
+
+<body class="scrollstyle" id="scrollstyle">
+
+
+<div class="container scrollbar">
+    <div class="input__wrapper">
+        <input class="input-form" type="text" placeholder="输入喜欢的球队" id="teams" />
+        <script>
+            document.getElementById('teams').onkeypress = function(e){
+                if (!e) e = window.event;
+                if (e.keyCode == '13'){
+                    alert(this.value);
+                    return false;
+                }
+            }
+        </script>
+
+    </div>
+
+
+    <table>
+        <thead>
+        <tr>
+            <th class="firstColumn">TIME</th>
+            <th class="secondColumn">GAME</th>
+            <th class="thirdColumn">BROADCAST</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for game in showListReady %}
+        <tr>
+            <td>
+                <div class="dateClass">{{game['Show Time'][0]}}</div>
+                <div class="timeClass">{{game['Show Time'][1]}}</div>
+            </td>
+            <td>
+                <span class="teamName">{{game['Team1']}}</span>
+                <span></span>
+<!--                <img src="{{game['Team1 Logo']}}">-->
+                <span class="VS">VS</span>
+<!--                <img src="{{game['Team2 Logo']}}">-->
+                <span></span>
+                <span class="teamName">{{game['Team2']}}</span>
+                <span class="leagueName">{{game['Labels'][0]}}</span>
+            </td>
+            <td>
+                {% for broadcast in game['Broadcast'] %}
+                <span class="broadcast">{{broadcast}}</span>
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+
+</html>

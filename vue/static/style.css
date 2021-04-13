@@ -1,0 +1,79 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #f66, #1b82c7);
+  background-attachment: fixed;
+  font-family: 微软雅黑, sans-serif;
+  font-weight: 100;
+}
+#logo {
+  position: fixed;
+  z-index: 2;
+  right: 20px;
+  bottom: 20px;
+}
+.container {
+  max-width: 600px;
+}
+.vs__search::placeholder {
+  color: rgba(0, 77, 165, 0.644);
+}
+.vs__dropdown-toggle:hover {
+  background-color: #ffffff4f;
+}
+.vs__search:focus {
+  background-color: #ffffffb6;
+}
+.vs__deselect:hover {
+  fill: rgba(255, 72, 0, 0.836);
+}
+.teamName {
+  font-weight: 550;
+}
+
+.leagueName {
+  font-size: 12px;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: bold;
+  margin: 0px 0px 0px 5px;
+  line-height: 1;
+  background: #c8cadb;
+  color: #5a5f8c;
+}
+
+.broadcast {
+  font-size: 14px;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 20px;
+  margin: 0px 0px 0px 5px;
+  line-height: 1;
+  background: #ffd8b0;
+  color: #5a5f8c;
+}
+
+.dateClass {
+  font-size: 14px;
+  text-align: left;
+}
+
+.timeClass {
+  font-size: 18px;
+  font-weight: bolder;
+  text-align: right;
+  text-shadow: 0px 0px 3px #fff;
+}
+
+th,
+td {
+  color: #fff;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}

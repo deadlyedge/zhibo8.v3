@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zhibo8 wrapper</title>
+    <script src="/static/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <ul>
+        <li v-for="game in games">
+            {{ game.Labels[0] }}
+        </li>
+      </ul>
+    </div>
+    <script>
+      var vm = new Vue({
+        el: "#root",
+        data: {
+          games: [],
+        },
+        mounted() {
+          axios
+            .get("static/test.json")
+            .then((response) => (this.games = response.data));
+        },
+      });
+    </script>
+  </body>
+</html>

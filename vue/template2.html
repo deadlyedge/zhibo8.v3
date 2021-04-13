@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>直播吧定制过滤 V2</title>
+    <script src="static/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="static/bootstrap.min.css" />
+    <link rel="stylesheet" href="static/style.css" />
+  </head>
+
+  <body class="scrollstyle" id="scrollstyle">
+    <div id="root" class="container scrollbar">
+      <div>
+        <span
+          class="badge rounded-pill bg-warning text-dark mt-1 me-1"
+          v-for="(team, i) in teams"
+        >
+          {{ team }}
+          <button
+            class="btn-close"
+            style="width: 9px; height: 9px"
+            @click="handleClick(i)"
+          ></button>
+        </span>
+        <input
+          class="input-form"
+          type="text"
+          placeholder="输入喜欢的球队"
+          id="teams"
+          v-model="team"
+          @keyup.enter="handleEnter"
+          @keyup.188="handleComma"
+        />
+        <autocomplete :items="teamList" />
+        <script type="text/x-template" id="autocomplete">
+          <div class="autocomplete">
+              <input class="input-form" type="text" @input="onChange" v-model="search"
+                  @keyup.down="onArrowDown" @keyup.up="onArrowUp" @keyup.enter="onEnter" />
+              <div>
+                  <ul id="autocomplete-results" v-show="isOpen" class="autocomplete-results">
+                      <li class="loading" v-if="isLoading">
+                          Loading results...
+                      </li>
+                      <li v-else v-for="(result, i) in results" :key="i"
+                          @click="setResult(result)" class="autocomplete-result"
+                          :class="{ 'is-active': i === arrowCounter }">
+                          {{ result }}
+                      </li>
+                  </ul>
+              </div>
+          </div>
+        </script>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th class="firstColumn">TIME</th>
+            <th class="secondColumn">GAME</th>
+            <th class="thirdColumn">BROADCAST</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="game in games">
+            <td>
+              <div class="dateClass">{{ game.showTime[0] }}</div>
+              <div class="timeClass">{{ game.showTime[1] }}</div>
+            </td>
+            <td>
+              <span class="teamName">{{ game.Team1 }}</span>
+              <span></span>
+              <!--                <img src="{{game['Team1 Logo']}}">-->
+              <span class="VS">VS</span>
+              <!--                <img src="{{game['Team2 Logo']}}">-->
+              <span></span>
+              <span class="teamName">{{ game.Team2 }}</span>
+              <span class="leagueName">{{ game.Labels[0] }}</span>
+            </td>
+            <td>
+              <span v-for="cast in game.Broadcast" class="broadcast">
+                {{ cast }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <script>
+      const Autocomplete = {
+        name: "autocomplete",
+        template: "#autocomplete",
+
+        props: {
+          items: {
+            type: Array,
+            required: false,
+            default: () => [],
+          },
+          isAsync: {
+            type: Boolean,
+            required: false,
+            default: false,
+          },
+        },
+
+        data() {
+          return {
+            isOpen: false,
+            results: [],
+            search: "",
+            isLoading: false,
+            arrowCounter: 0,
+          };
+        },
+
+        methods: {
+          onChange() {
+            // Let's warn the parent that a change was made
+            this.$emit("input", this.search);
+
+            // Is the data given by an outside ajax request?
+            if (this.isAsync) {
+              this.isLoading = true;
+            } else {
+              // Let's search our flat array
+              this.filterResults();
+              this.isOpen = true;
+            }
+          },
+
+          filterResults() {
+            // first uncapitalize all the things
+            this.results = this.items.filter((item) => {
+              return item.toLowerCase().indexOf(this.search.toLowerCase()) > -1;
+            });
+          },
+          setResult(result) {
+            this.search = result;
+            this.isOpen = false;
+          },
+          onArrowDown(evt) {
+            if (this.arrowCounter < this.results.length) {
+              this.arrowCounter = this.arrowCounter + 1;
+            }
+          },
+          onArrowUp() {
+            if (this.arrowCounter > 0) {
+              this.arrowCounter = this.arrowCounter - 1;
+            }
+          },
+          onEnter() {
+            this.search = this.results[this.arrowCounter];
+            this.isOpen = false;
+            console.log(this.arrowCounter);
+            this.arrowCounter = -1;
+          },
+          handleClickOutside(evt) {
+            if (!this.$el.contains(evt.target)) {
+              this.isOpen = false;
+              this.arrowCounter = -1;
+            }
+          },
+        },
+        watch: {
+          items: function (val, oldValue) {
+            // actually compare them
+            if (val.length !== oldValue.length) {
+              this.results = val;
+              this.isLoading = false;
+            }
+          },
+        },
+        mounted() {
+          axios
+            .get("http://localhost:8000/teamList/")
+            // .get("../static/test.json")
+            .then((response) => (vm.teamList = response.data));
+          document.addEventListener("click", this.handleClickOutside);
+        },
+        destroyed() {
+          document.removeEventListener("click", this.handleClickOutside);
+        },
+      };
+      var vm = new Vue({
+        el: "#root",
+        data: {
+          games: [],
+          team: "",
+          teams: [],
+          teamList: [],
+          result: [],
+        },
+        components: {
+          autocomplete: Autocomplete,
+        },
+        methods: {
+          handleEnter() {
+            this.teams.push(this.team);
+            this.team = "";
+          },
+          handleComma() {
+            this.team = this.team.slice(0, -1);
+            this.teams.push(this.team);
+            this.team = "";
+          },
+          handleClick(i) {
+            this.teams.splice(i, 1);
+          },
+        },
+        watch: {
+          teams(newVal, oldVal) {
+            axios
+              .get("http://localhost:8000/?teams=" + newVal)
+              .then((response) => (this.games = response.data));
+          },
+        },
+        mounted() {
+          axios
+            .get("http://localhost:8000")
+            // .get("../static/test.json")
+            .then((response) => (this.games = response.data));
+        },
+      });
+    </script>
+  </body>
+</html>

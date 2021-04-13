@@ -1,0 +1,15 @@
+{
+  "name": "vue-zhibo8",
+  "version": "0.0.3",
+  "description": "this is a wrapper of zhibo8.com, helps find your faverite games.",
+  "main": "index.js",
+  "scripts": {
+    "start": "browser-sync start -s -f **/* --directory --watch"
+  },
+  "keywords": [],
+  "author": "xdream@gmail.com",
+  "license": "GNU V3",
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
