@@ -2,4 +2,4 @@
 /.venv/
 /app/config.*
 /vue/node_modules
-
+/vue/config.*

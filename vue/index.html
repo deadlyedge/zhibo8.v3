@@ -35,9 +35,9 @@
       <table class="table">
         <thead>
           <tr>
-            <th class="firstColumn">TIME</th>
-            <th class="secondColumn">GAME</th>
-            <th class="thirdColumn">BROADCAST</th>
+            <th>TIME</th>
+            <th>GAME</th>
+            <th>BROADCAST</th>
           </tr>
         </thead>
         <tbody>
@@ -67,11 +67,17 @@
       <div id="logo">
         <a href="https://www.zhibo8.cc" class="btn btn-warning">
           跳转到直播吧
-          <img src="static/zhibo8.wrapper.logo.png" alt="zhibo8.wrapper" width="50" height="50"/>
+          <img
+            src="static/zhibo8.wrapper.logo.png"
+            alt="zhibo8.wrapper"
+            width="50"
+            height="50"
+          />
         </a>
       </div>
     </div>
-    <script>
+    <script type="module">
+      import config from "./config.js";
       Vue.component("v-select", VueSelect.VueSelect);
       Vue.$cookies.config(-1);
       var cookie = Vue.$cookies.get("userTeams");
@@ -88,21 +94,20 @@
         watch: {
           selected(newVal, oldVal) {
             axios
-              .get("http://192.168.50.22:8001/?teams=" + newVal)
+              .get(baseURL + "/?teams=" + newVal)
               .then((response) => (this.games = response.data));
             this.$cookies.set("userTeams", newVal);
           },
         },
         mounted() {
           axios
-            .get("http://192.168.50.22:8001/?teams=" + this.selected)
+            .get(config.baseURL + "/?teams=" + this.selected)
             // .get("../static/test.json")
             .then((response) => (this.games = response.data));
           axios
-            .get("http://192.168.50.22:8001/teamList/")
+            .get(config.baseURL + "/teamList/")
             .then((response) => (this.teamList = response.data));
         },
-        updated() {},
       });
     </script>
   </body>
