@@ -8,6 +8,7 @@ config = toml.load('config.toml')
 logger = xlogger.get_my_logger(__name__)
 
 DEFAULT_TEAMS_STRING = config['app']['DEFAULT_TEAMS_STRING']
+getLists.initDB()
 
 # logger.debug(gameList)
 app = FastAPI()

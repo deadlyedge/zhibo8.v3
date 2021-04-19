@@ -94,7 +94,7 @@
         watch: {
           selected(newVal, oldVal) {
             axios
-              .get(baseURL + "/?teams=" + newVal)
+              .get(config.baseURL + "/?teams=" + newVal)
               .then((response) => (this.games = response.data));
             this.$cookies.set("userTeams", newVal);
           },

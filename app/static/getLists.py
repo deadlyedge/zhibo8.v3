@@ -1,12 +1,17 @@
 import time
 import pymongo
 import toml
+import random
+from threading import Timer
+
+from pymongo.errors import DuplicateKeyError
+
 from static import xlogger
 from pyquery import PyQuery as pq
 
 config = toml.load('config.toml')
 logger = xlogger.get_my_logger(__name__)
-GRAB_INTERVAL = config['app']['GRAB_INTERVAL']
+GRAB_TIMER_BASE = config['app']['GRAB_TIMER_BASE']
 
 dbClient = pymongo.MongoClient(
     'mongodb://%s:%s@%s/' % (config['database']['user'],
@@ -24,15 +29,23 @@ url = 'https://www.zhibo8.cc/'
 
 
 def writeDB(gameList: list, teamList: set):
-    if gameList:
+    if gameList and len(gameList) > 200:
         myDB.drop_collection('gameList')
         myDB.drop_collection('dataUpdate')
         myDB.drop_collection('teamList')
+    else:
+        return
+    myDB.dataUpdate.create_index([('uniqueCheck', pymongo.DESCENDING)], unique=True)
     now = time.time()
-    myDB.dataUpdate.insert_one({
-        'timestamp': now,
-        'updateTime': time.strftime("%Y-%m-%d %H:%M", time.localtime(now))
-    })
+    try:
+        myDB.dataUpdate.insert_one({
+            'uniqueCheck': 'set',
+            'timestamp': now,
+            'updateTime': time.strftime("%Y-%m-%d %H:%M", time.localtime(now))
+        })
+    except DuplicateKeyError:
+        logger.info('duplicate, no need to write.')
+        return
     myDB.teamList.insert_one({
         'teamList': list(teamList)
     })
@@ -44,10 +57,10 @@ def getPage():
     for retry in range(5):
         try:
             rqs = pq(url, headers=header, encoding='utf-8')
-            return rqs
         except Exception as e:
             logger.warning('通过失败，重新尝试... %s' % e)
             continue
+        return rqs
     logger.error('检查是否可以打开%s' % url)
     input('输入回车结束程序...')
     return []
@@ -90,12 +103,12 @@ def grabGameList():
 
 
 def getGameList() -> list:
-    now = time.time()
-    lastUpdate = myDB.dataUpdate.find_one()  # {'timestamp': {'$gt': 1.0}}
-    if not lastUpdate or now - lastUpdate['timestamp'] > GRAB_INTERVAL:
-        grabGameList()
-    else:
-        logger.info('No need to grab...')
+    # now = time.time()
+    # lastUpdate = myDB.dataUpdate.find_one()  # {'timestamp': {'$gt': 1.0}}
+    # if not lastUpdate or now - lastUpdate['timestamp'] > GRAB_INTERVAL:
+    #     grabGameList()
+    # else:
+    #     logger.info('No need to grab...')
     result = list(myDB.gameList.aggregate([{
         '$sort': {
             'Time.0': 1,
@@ -114,6 +127,17 @@ def getTeamList() -> list:
         return teams['teamList']
     else:
         return []
+
+
+def testTimer():
+    pass
+
+
+def initDB():
+    grabGameList()
+    logger.debug('timer ' + time.strftime("%H:%M:%S", time.localtime(time.time())))
+    seed = random.randint(0, 1800)
+    Timer(GRAB_TIMER_BASE + seed, initDB).start()
 
 
 if __name__ == '__main__':
